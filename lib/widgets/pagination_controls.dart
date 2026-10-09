@@ -14,7 +14,7 @@ class PaginationControls extends ConsumerWidget {
       children: [
         ElevatedButton(
           onPressed: () => ref.read(pageProvider.notifier).previousPage(),
-          child: const Text('Précédent'),
+          child: const Text('Previous'),
         ),
         
         Padding(
@@ -24,7 +24,7 @@ class PaginationControls extends ConsumerWidget {
         
         ElevatedButton(
           onPressed: () => ref.read(pageProvider.notifier).nextPage(),
-          child: const Text('Suivant'),
+          child: const Text('Next'),
         ),
       ],
     );
