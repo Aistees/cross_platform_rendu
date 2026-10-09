@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ApiRepository {
 
-  Future<List<DogHomeModel>> fetchAllDogs(int page) async {
+  Future<List<DogHomeModel>> fetchAllDogsPaginated(int page) async {
     String urlFetchAllDogsByPage = "https://dogapi.dog/api/v2/breeds?page[number]=$page";
     print(urlFetchAllDogsByPage);
 
@@ -41,4 +41,32 @@ class ApiRepository {
       throw Exception('Network error $e');
     }
   }
+
+Future<List<DogHomeModel>> fetchAllDogs() async {
+  final List<DogHomeModel> allDogs = [];
+  String? nextUrl = "https://dogapi.dog/api/v2/breeds";
+
+  try {
+    while (nextUrl != null) {
+      final response = await http.get(Uri.parse(nextUrl));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        final List<dynamic> data = jsonResponse['data'] ?? [];
+
+        allDogs.addAll(
+          data.map((dog) => DogHomeModel.fromJson(dog)).toList(),
+        );
+
+        final Map<String, dynamic>? links = jsonResponse['links'];
+        nextUrl = links?['next'];
+      } else {
+        throw Exception('Erreur API: ${response.statusCode}');
+      }
+    }
+    return allDogs;
+  } catch (e) {
+    throw Exception('Erreur réseau: $e');
+  }
+}
 }
