@@ -29,7 +29,7 @@ class MobileHomeView extends ConsumerWidget {
           child: TextField(
             onChanged: (value) => ref.read(searchQueryProvider.notifier).updateSearch(value),
             decoration: InputDecoration(
-              hintText: 'Search a race...',
+              hintText: 'Search a breed...',
               prefixIcon: const Icon(Icons.search),
               suffixIcon: searchQuery.isNotEmpty 
                   ? IconButton(

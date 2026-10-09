@@ -129,7 +129,7 @@ class DetailsPage extends ConsumerWidget {
                       children: [
                         Icon(Icons.health_and_safety, color: Colors.green),
                         SizedBox(width: 12),
-                        Text("Race hypoallergénique", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                        Text("Hyppoallergenic breed", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),

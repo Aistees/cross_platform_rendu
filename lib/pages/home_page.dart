@@ -28,7 +28,7 @@ class HomePage extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Adopte un Wouf',
+              'Adopt a Woof',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 12),
