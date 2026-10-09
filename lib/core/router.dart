@@ -7,13 +7,13 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomePage(title: 'Adopte un Wouf',),
+      builder: (context, state) => const HomePage(title: 'Adopt a Woof',),
     ),
     GoRoute(
       path: '/details/:id',
       builder: (context, state) {
         final itemId = state.pathParameters['id']!;
-        return DetailsPage(id: itemId, title: 'Adopte un Wouf',);
+        return DetailsPage(id: itemId, title: 'Adopt a Woof',);
       }
     ),
     GoRoute(
