@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/repository_provider.dart';
 import '../widgets/pagination_controls.dart';
+
+import 'media_query_pages/mobile_home_view.dart';
+import 'media_query_pages/tablet_home_view.dart';
 
 class HomePage extends ConsumerWidget {
   final String title;
@@ -12,76 +14,52 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    final dogState = ref.watch(multipleDogProvider);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final searchQuery = ref.watch(searchQueryProvider);
+    
+    final dogState = searchQuery.trim().isEmpty
+        ? ref.watch(multipleDogProvider)
+        : ref.watch(allDogsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adopte un Wouf'),
+        centerTitle: false,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Adopte un Wouf',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 12),
+            TextButton.icon(
+              onPressed: () => context.push('/favorites'),
+              label: const Text('Favorites'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                visualDensity: VisualDensity.compact,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       body: dogState.when( 
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, StackTrace) => Center(child: Text('Error: $error')),
-        data: (dogs) => Column(
-            children: [
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, 
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 10.0,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemCount: dogs.length,
-                  itemBuilder: (context, index) {
-                    final dog = dogs[index];                
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 3,
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: () => context.push('/details/${dog.id}'),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              child: dog.image.isNotEmpty
-                                  ? CachedNetworkImage(
-                                    imageUrl: dog.image,
-                                    fit: BoxFit.cover,
-                                    memCacheWidth: 300, // Même principe d'optimisation mémoire
-                                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                    errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 40, color: Colors.grey),
-                                  )
-                                  : const Icon(Icons.pets, size: 40, color: Colors.grey),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                dog.name,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
-        ),
-        bottomNavigationBar: const PaginationControls(),
-      );
+        data: (dogs) {
+          if (screenWidth < 600) {
+            return MobileHomeView(dogs: dogs);
+          } else {
+            return TabletHomeView(dogs: dogs, screenWidth: screenWidth);
+          }
+        },
+      ),
+      bottomNavigationBar: const PaginationControls(),
+    );
   }
 }
